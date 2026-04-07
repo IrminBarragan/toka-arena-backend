@@ -22,13 +22,16 @@ public class TokagotchiService {
     private final Random random = new Random();
 
     public Tokagotchi createStarter() {
-
         String username = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
 
         User user = userRepo.findByUsername(username)
                 .orElseThrow();
+
+        if (user.isFirstToka()) {
+            throw new RuntimeException("Starter already started");
+        }
 
         Rarity rarity = rollRarity();
 
@@ -56,6 +59,9 @@ public class TokagotchiService {
                 .cp(cp)
                 .owner(user)
                 .build();
+
+        user.setFirstToka(true);
+        userRepo.save(user);
 
         return tokaRepo.save(toka);
     }

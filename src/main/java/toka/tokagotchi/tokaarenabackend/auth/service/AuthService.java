@@ -26,13 +26,15 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .essences(0)
                 .enabled(true)
+                .firstToka(false)
                 .build();
 
         userRepository.save(user);
 
         String token = jwtService.generateToken(user.getUsername());
 
-        return new AuthResponse(token);
+
+        return new AuthResponse(token, false);
     }
 
     public AuthResponse login(AuthRequest request) {
@@ -46,6 +48,6 @@ public class AuthService {
 
         String token = jwtService.generateToken(user.getUsername());
 
-        return new AuthResponse(token);
+        return new AuthResponse(token, user.isFirstToka());
     }
 }

@@ -28,6 +28,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private boolean firstToka = false;
+
     // Relación con tokas
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Tokagotchi> tokagotchis;
