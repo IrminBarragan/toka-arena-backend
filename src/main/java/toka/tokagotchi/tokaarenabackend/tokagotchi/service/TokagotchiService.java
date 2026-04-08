@@ -56,7 +56,6 @@ public class TokagotchiService {
                 .hp(hp)
                 .atk(atk)
                 .def(def)
-                .happiness(happiness)
                 .cp(cp)
                 .owner(user)
                 .build();

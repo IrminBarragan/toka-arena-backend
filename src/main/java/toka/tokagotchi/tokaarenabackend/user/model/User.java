@@ -2,6 +2,8 @@ package toka.tokagotchi.tokaarenabackend.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import toka.tokagotchi.tokaarenabackend.inventory.model.UserAccessory;
+import toka.tokagotchi.tokaarenabackend.inventory.model.UserConsumable;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.model.Tokagotchi;
 
 import java.util.List;
@@ -28,15 +30,18 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    private boolean enabled = true;
+
+    private int tf;
+
     private boolean firstToka = false;
 
-    // Relación con tokas
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tokagotchi> tokagotchis;
 
-    // Recursos (ej: esencias)
-    private int essences;
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAccessory> accessories;
 
-    private boolean enabled = true;
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserConsumable> consumables;
 }

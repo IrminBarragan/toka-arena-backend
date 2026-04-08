@@ -24,7 +24,6 @@ public class AuthService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .essences(0)
                 .enabled(true)
                 .firstToka(false)
                 .build();

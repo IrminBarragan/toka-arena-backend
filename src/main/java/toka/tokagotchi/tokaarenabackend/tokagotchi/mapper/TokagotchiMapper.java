@@ -24,7 +24,6 @@ public class TokagotchiMapper {
                 .rareza(mapRarity(toka.getRarity().name()))
 
                 .stats(buildStats(toka))
-                .felicidad(toka.getHappiness())
 
                 .habilidades(mapAbilities(toka))
 

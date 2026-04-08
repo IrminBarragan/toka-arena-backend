@@ -17,10 +17,15 @@ public class Accessory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; // "Casco", "Supercapa"
+    @Column(nullable = false)
+    private String name;
 
     @Enumerated(EnumType.STRING)
-    private AccessoryType type; // HEAD / BODY
+    private AccessoryType type;
 
+    @Column(nullable = false)
     private String assetPath;
+
+    @Column(nullable = false)
+    private double cost;
 }

@@ -14,18 +14,15 @@ import toka.tokagotchi.tokaarenabackend.common.enums.Species;
 public class Ability {
 
     @Id
-    private String id; // "zarpazo", "agilidad", etc.
+    private String id;
 
     private String nombre;
-
     private int costoNRG;
-
-    private Double multiplicador; // puede ser null
-
+    private Double multiplicador;
     private String descripcion;
-
     private boolean esSignature;
+    private boolean scaleWithRarity;
 
     @Enumerated(EnumType.STRING)
-    private Species species; // a qué especie pertenece
+    private Species species;
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import toka.tokagotchi.tokaarenabackend.common.enums.Rarity;
 import toka.tokagotchi.tokaarenabackend.common.enums.Species;
+import toka.tokagotchi.tokaarenabackend.inventory.model.UserAccessory;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
 
 @Entity
@@ -31,11 +32,16 @@ public class Tokagotchi {
     private int atk;
     private int def;
 
-    private int happiness;
     private int cp;
 
     // Relación con usuario
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User owner;
+
+    @ManyToOne
+    private UserAccessory head;
+
+    @ManyToOne
+    private UserAccessory body;
 }
