@@ -1,10 +1,16 @@
 package toka.tokagotchi.tokaarenabackend.tokagotchi.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import toka.tokagotchi.tokaarenabackend.common.enums.Rarity;
 import toka.tokagotchi.tokaarenabackend.common.enums.Species;
+import toka.tokagotchi.tokaarenabackend.inventory.model.Accessory;
+import toka.tokagotchi.tokaarenabackend.inventory.model.UserAccessory;
+import toka.tokagotchi.tokaarenabackend.inventory.repository.UserAccessoryRepository;
+import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.TokagotchiResponse;
+import toka.tokagotchi.tokaarenabackend.tokagotchi.mapper.TokagotchiMapper;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.model.Tokagotchi;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.repository.TokagotchiRepository;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
@@ -19,9 +25,40 @@ public class TokagotchiService {
 
     private final TokagotchiRepository tokaRepo;
     private final UserRepository userRepo;
-
+    private final UserAccessoryRepository userAccessoryRepo;
+    private final TokagotchiMapper tokaMapper;
     private final Random random = new Random();
+    
+    @Transactional
+    public TokagotchiResponse equipAccessory(Long tokaId, Long userAccessoryId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepo.findByUsername(username).orElseThrow();
 
+        Tokagotchi toka = tokaRepo.findById(tokaId)
+                .orElseThrow(() -> new RuntimeException("Tokagotchi no encontrado"));
+
+        if (!toka.getOwner().getId().equals(user.getId())) {
+            throw new RuntimeException("No eres el dueño de este Tokagotchi");
+        }
+
+        UserAccessory userAcc = userAccessoryRepo.findById(userAccessoryId)
+                .orElseThrow(() -> new RuntimeException("Accesorio no encontrado en tu inventario"));
+
+        if (!userAcc.getOwner().getId().equals(user.getId())) {
+            throw new RuntimeException("Este accesorio no te pertenece");
+        }
+
+        Accessory accessory = userAcc.getAccessory();
+
+        // Lógica de slots según AccessoryType
+        if (accessory.getType().name().equals("HEAD")) {
+            toka.setEquippedHead(accessory);
+        } else {
+            toka.setEquippedBody(accessory);
+        }
+
+        return tokaMapper.toResponse(tokaRepo.save(toka));
+    }
     public Tokagotchi createStarter() {
         String username = Objects.requireNonNull(SecurityContextHolder.getContext()
                         .getAuthentication())

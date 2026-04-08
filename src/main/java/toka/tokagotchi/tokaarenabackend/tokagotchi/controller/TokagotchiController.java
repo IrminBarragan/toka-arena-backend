@@ -1,6 +1,7 @@
 package toka.tokagotchi.tokaarenabackend.tokagotchi.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.RenameTokagotchiRequest;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.TokagotchiResponse;
@@ -28,5 +29,12 @@ public class TokagotchiController {
     @PatchMapping("/{id}/rename")
     public TokagotchiResponse renameTokagotchi(@PathVariable long id, @RequestBody RenameTokagotchiRequest request) {
         return mapper.toResponse(service.reameTokagotchi(id, request.getNewName()));
+    }
+
+    @PostMapping("/{tokaId}/equip/{userAccessoryId}")
+    public ResponseEntity<TokagotchiResponse> equip(
+            @PathVariable Long tokaId,
+            @PathVariable Long userAccessoryId) {
+        return ResponseEntity.ok(service.equipAccessory(tokaId, userAccessoryId));
     }
 }
