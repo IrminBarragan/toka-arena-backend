@@ -24,8 +24,5 @@ public class Accessory {
     private AccessoryType type;
 
     @Column(nullable = false)
-    private String assetPath;
-
-    @Column(nullable = false)
-    private double cost;
+    private double price;
 }

@@ -18,9 +18,12 @@ public class Consumable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
-    private String effect;
+    @Column(nullable = false)
+    private String description;
 
-    private int cost;
+    @Column(nullable = false)
+    private double price;
 }
