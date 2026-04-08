@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 public class UserProfileResponse {
     private String username;
-    private int tf;
+    private double tf;
 
     private List<TokagotchiResponse> tokagotchis;
     private List<AccessoryDTO> accessories;

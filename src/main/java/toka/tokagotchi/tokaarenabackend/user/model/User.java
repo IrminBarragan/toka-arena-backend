@@ -32,7 +32,7 @@ public class User {
 
     private boolean enabled = true;
 
-    private int tf;
+    private double tf;
 
     private boolean firstToka = false;
 
