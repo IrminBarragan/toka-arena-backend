@@ -15,6 +15,11 @@ public class TokagotchiController {
     private final TokagotchiService service;
     private final TokagotchiMapper mapper;
 
+    @GetMapping("/{id}/get")
+    public TokagotchiResponse getTokagotchiById(@PathVariable Long id) {
+        return mapper.toResponse(service.getTokagotchiById(id));
+    }
+
     @PostMapping("/claim-starter")
     public TokagotchiResponse claimStarter() {
         return mapper.toResponse(service.createStarter());

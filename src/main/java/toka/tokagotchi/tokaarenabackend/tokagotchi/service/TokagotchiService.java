@@ -90,6 +90,11 @@ public class TokagotchiService {
         return tokaRepo.save(toka);
     }
 
+    public Tokagotchi getTokagotchiById(Long tokaId) {
+        return tokaRepo.findById(tokaId)
+                .orElseThrow();
+    }
+
     private Rarity rollRarity() {
         int roll = random.nextInt(100) + 1;
 
