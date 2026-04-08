@@ -10,6 +10,7 @@ import toka.tokagotchi.tokaarenabackend.tokagotchi.repository.TokagotchiReposito
 import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
+import java.util.Objects;
 import java.util.Random;
 
 @Service
@@ -22,8 +23,8 @@ public class TokagotchiService {
     private final Random random = new Random();
 
     public Tokagotchi createStarter() {
-        String username = SecurityContextHolder.getContext()
-                .getAuthentication()
+        String username = Objects.requireNonNull(SecurityContextHolder.getContext()
+                        .getAuthentication())
                 .getName();
 
         User user = userRepo.findByUsername(username)
@@ -63,6 +64,29 @@ public class TokagotchiService {
         user.setFirstToka(true);
         userRepo.save(user);
 
+        return tokaRepo.save(toka);
+    }
+
+    public Tokagotchi reameTokagotchi(Long tokaId, String newName) {
+        String username = (SecurityContextHolder.getContext()
+                        .getAuthentication())
+                .getName();
+
+        User user = userRepo.findByUsername(username)
+                .orElseThrow();
+
+        Tokagotchi toka = tokaRepo.findById(tokaId)
+                .orElseThrow();
+
+        if (!toka.getOwner().getId().equals(user.getId())) {
+            throw new RuntimeException("Not your toka");
+        }
+
+        if (newName == null || newName.length() < 3 || newName.length() > 20) {
+            throw new RuntimeException("Invalid name");
+        }
+
+        toka.setName(newName);
         return tokaRepo.save(toka);
     }
 

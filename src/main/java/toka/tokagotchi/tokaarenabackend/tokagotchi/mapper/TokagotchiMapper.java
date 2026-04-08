@@ -19,7 +19,7 @@ public class TokagotchiMapper {
 
         return TokagotchiResponse.builder()
                 .id(generateId(toka))
-                .nombre(toka.getSpecies().name())
+                .nombre(toka.getName())
                 .especie(toka.getSpecies().name().toLowerCase())
                 .rareza(mapRarity(toka.getRarity().name()))
 
