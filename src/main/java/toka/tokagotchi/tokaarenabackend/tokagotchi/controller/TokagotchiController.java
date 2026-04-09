@@ -37,7 +37,7 @@ public class TokagotchiController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{id}/rename")
+    @PostMapping("/{id}/rename")
     public TokagotchiResponse renameTokagotchi(@PathVariable long id, @RequestBody RenameTokagotchiRequest request) {
         return mapper.toResponse(service.reameTokagotchi(id, request.getNewName()));
     }
