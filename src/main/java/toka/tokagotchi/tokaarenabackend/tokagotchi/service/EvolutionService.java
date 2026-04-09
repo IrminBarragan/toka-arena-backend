@@ -20,7 +20,7 @@ public class EvolutionService {
 
     private final TokagotchiRepository tokaRepo;
     private final UserRepository userRepo;
-    private final TokagotchiMapper tokaMapper; // Asegúrate de inyectarlo
+    private final TokagotchiMapper tokaMapper;
     private final Random random = new Random();
 
     @Transactional
@@ -30,63 +30,62 @@ public class EvolutionService {
 
         User owner = toka.getOwner();
 
-        // 1. Validar Cooldown (Sección 4 del PDF) [cite: 1]
+        // 1. Validar Cooldown (Sección 4 del PDF)
+        // Mensaje específico solicitado para errores de tiempo
         if (toka.getEvolutionCooldown() != null && toka.getEvolutionCooldown().isAfter(LocalDateTime.now())) {
-            throw new RuntimeException("El Tokagotchi aún está en cooldown de recuperación.");
+            throw new RuntimeException("Espera para regresar");
         }
 
         Rarity currentRarity = toka.getRarity();
         EvolutionConfig config = getEvolutionConfig(currentRarity);
 
-        // 2. Validar Requisitos (Sección 4 del PDF) [cite: 1]
-        if (toka.getCp() < config.minCp) throw new RuntimeException("CP insuficientes: " + config.minCp);
-        if (owner.getTf() < config.costTf) throw new RuntimeException("TF insuficiente: " + config.costTf);
+        // 2. Validar Requisitos específicos (Sección 4 del PDF)
+        if (toka.getCp() < config.minCp) {
+            throw new RuntimeException("CP insuficientes. Necesitas " + config.minCp + " puntos de cuidado.");
+        }
+        if (owner.getTf() < config.costTf) {
+            throw new RuntimeException("No tienes suficientes Toka Feed (TF). Costo: " + config.costTf);
+        }
 
-        // 3. Cobrar TF [cite: 1]
+        // 3. Cobrar TF [cite: 18, 70, 71, 73]
         owner.setTf(owner.getTf() - config.costTf);
         userRepo.save(owner);
 
-        // 4. Probabilidad de éxito [cite: 1]
+        // 4. Probabilidad de Éxito
         int roll = random.nextInt(100) + 1;
         if (roll <= config.successProb) {
             applyEvolution(toka, getNextRarity(currentRarity));
             toka.setEvolutionCooldown(null);
             tokaRepo.save(toka);
-            return new EvolutionResultDTO(true, "¡Evolución exitosa!", tokaMapper.toResponse(toka));
+            // Mensaje específico solicitado para éxito
+            return new EvolutionResultDTO(true, "Cuidado correcto: ¡Ascenso exitoso!", tokaMapper.toResponse(toka));
         } else {
-            // Fallo: Aplicar cooldown según tabla (12h, 24h, 48h) [cite: 1]
+            // Fallo: Aplicar cooldown según tabla (12h, 24h, 48h)
             toka.setEvolutionCooldown(LocalDateTime.now().plusHours(config.cooldownHours));
             tokaRepo.save(toka);
-            return new EvolutionResultDTO(false, "El ascenso ha fallado.", tokaMapper.toResponse(toka));
+            return new EvolutionResultDTO(false, "El ascenso ha fallado. Inténtalo más tarde.", tokaMapper.toResponse(toka));
         }
     }
 
     private void applyEvolution(Tokagotchi toka, Rarity nextRarity) {
-        double oldMult = getMultiplier(toka.getRarity());
-        double newMult = getMultiplier(nextRarity);
+        // Multiplicadores según Sección 1.2
+        double oldMult = toka.getRarity().getMultiplier();
+        double newMult = nextRarity.getMultiplier();
 
-        // Recalcular stats manteniendo el jitter base [cite: 1]
+        // Recalcular stats manteniendo el jitter base [cite: 13]
         toka.setHp((int) Math.round((toka.getHp() / oldMult) * newMult));
         toka.setAtk((int) Math.round((toka.getAtk() / oldMult) * newMult));
         toka.setDef((int) Math.round((toka.getDef() / oldMult) * newMult));
         toka.setRarity(nextRarity);
     }
 
-    private double getMultiplier(Rarity r) {
-        return switch (r) {
-            case COMMON -> 1.0;
-            case RARE -> 1.15;
-            case EPIC -> 1.35;
-            case LEGENDARY -> 1.55;
-        };
-    }
-
     private EvolutionConfig getEvolutionConfig(Rarity current) {
+        // Datos basados en la tabla de la Sección 4
         return switch (current) {
             case COMMON -> new EvolutionConfig(100, 10, 40, 12);
             case RARE -> new EvolutionConfig(300, 25, 30, 24);
             case EPIC -> new EvolutionConfig(600, 50, 20, 48);
-            case LEGENDARY -> throw new RuntimeException("Ya es Legendario.");
+            case LEGENDARY -> throw new RuntimeException("Tu Tokagotchi ya alcanzó el nivel máximo (Legendario).");
         };
     }
 
