@@ -58,6 +58,7 @@ public class UserController {
                                 .description(uc.getConsumable().getDescription())
                                 .build())
                         .collect(Collectors.toList()))
+                .tokagotchiActivo(user.getTokagotchiActivo() != null ? tokaMapper.toResponse(user.getTokagotchiActivo()) : null)
                 .build();
 
         return ResponseEntity.ok(response);

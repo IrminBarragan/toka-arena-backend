@@ -15,6 +15,7 @@ public class UserDTO {
     private String username;
     private double tf;
     private boolean firstToka;
+    private TokagotchiResponse tokagotchiActivo;
 
     private List<TokagotchiResponse> tokagotchis;
     private List<AccessoryDTO> accessories;
