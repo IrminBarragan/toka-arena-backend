@@ -52,7 +52,7 @@ public class TokagotchiService {
             throw new RuntimeException("No eres el dueño de este Tokagotchi");
         }
 
-        UserAccessory userAcc = userAccessoryRepo.findById(userAccessoryId)
+        UserAccessory userAcc = userAccessoryRepo.findByAccessory_Id(userAccessoryId)
                 .orElseThrow(() -> new RuntimeException("Accesorio no encontrado en tu inventario"));
 
         if (!userAcc.getOwner().getId().equals(user.getId())) {
