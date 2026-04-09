@@ -1,6 +1,11 @@
 package toka.tokagotchi.tokaarenabackend.common.enums;
 
 import lombok.Getter;
+/**
+ * Rarity: componente del modulo `common`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Getter
 public enum Rarity {

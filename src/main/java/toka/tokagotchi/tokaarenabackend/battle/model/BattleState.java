@@ -5,6 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
+/**
+ * BattleState: componente del modulo `battle`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Data
 @AllArgsConstructor

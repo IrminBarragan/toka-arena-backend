@@ -4,6 +4,11 @@ package toka.tokagotchi.tokaarenabackend.inventory.model;
 import jakarta.persistence.*;
 import lombok.*;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
+/**
+ * UserConsumable: componente del modulo `inventory`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Entity
 @Table(name = "user_consumables")

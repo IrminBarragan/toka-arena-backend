@@ -3,6 +3,11 @@ package toka.tokagotchi.tokaarenabackend.tokagotchi.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+/**
+ * EvolutionResultDTO: componente del modulo `tokagotchi`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Data
 @AllArgsConstructor

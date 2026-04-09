@@ -17,12 +17,22 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+/**
+ * Servicio principal del modulo de batalla.
+ * Administra la creacion de combates, validaciones de turnos/habilidades
+ * y la resolucion final incluyendo apuesta en modo riesgoso.
+ */
 public class BattleService {
 
     private final AbilityRepository abilityRepo;
     private final TokagotchiRepository tokaRepo;
     private final BattleMemoryStorage storage;
 
+    /**
+     * Inicia una batalla usando el usuario autenticado como retador.
+     * Valida ownership del Tokagotchi atacante y permite seleccionar
+     * modo NORMAL o RISKY con confirmacion explicita.
+     */
     public BattleState createBattle(Long requesterId, StartBattleRequest request) {
         if (request == null || request.getMyTokaId() == null || request.getOpponentTokaId() == null) {
             throw new RuntimeException("Debes enviar los Tokagotchis para iniciar la batalla");
@@ -47,6 +57,10 @@ public class BattleService {
         return createBattleInternal(p1, p2, BattleMode.NORMAL, false);
     }
 
+    /**
+     * Construye el estado inicial de batalla asegurando invariantes basicas:
+     * no auto-combate, no mismo owner y confirmacion de riesgo en modo RISKY.
+     */
     private BattleState createBattleInternal(Tokagotchi p1, Tokagotchi p2, BattleMode mode, boolean riskConfirmed) {
         if (p1.getId().equals(p2.getId())) {
             throw new RuntimeException("No puedes iniciar batalla contra el mismo Tokagotchi");
@@ -85,6 +99,11 @@ public class BattleService {
         return storage.findById(battleId);
     }
 
+    /**
+     * Ejecuta un turno de ataque:
+     * valida turno y energia, aplica dano, cambia turno,
+     * regenera energia rival y cierra la batalla si hay KO.
+     */
     @Transactional
     public BattleState performAttack(Long playerId, AttackRequest request) {
         BattleState state = storage.findById(request.getBattleId());
@@ -143,6 +162,10 @@ public class BattleService {
         return state;
     }
 
+    /**
+     * Si la batalla fue RISKY y estaba confirmada,
+     * transfiere el Tokagotchi perdedor al owner del ganador.
+     */
     private void applyRiskyStakeIfNeeded(BattleState state) {
         if (!"RISKY".equalsIgnoreCase(state.getMode()) || !state.isRiskConfirmed()) {
             return;

@@ -15,6 +15,11 @@ import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
 import java.util.stream.Collectors;
+/**
+ * UserController: componente del modulo `user`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @RestController
 @RequestMapping("/api/v1/users")

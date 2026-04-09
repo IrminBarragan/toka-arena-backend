@@ -2,6 +2,11 @@ package toka.tokagotchi.tokaarenabackend.tokagotchi.dto;
 
 import lombok.Builder;
 import lombok.Data;
+/**
+ * AbilityDTO: componente del modulo `tokagotchi`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Data
 @Builder

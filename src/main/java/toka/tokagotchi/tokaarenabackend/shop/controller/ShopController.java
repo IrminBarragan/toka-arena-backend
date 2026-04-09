@@ -8,6 +8,11 @@ import toka.tokagotchi.tokaarenabackend.inventory.dto.CoinPackageResponse;
 import toka.tokagotchi.tokaarenabackend.shop.ShopService.ShopService;
 
 import java.util.List;
+/**
+ * ShopController: componente del modulo `shop`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @RestController
 @RequestMapping("/api/v1/shop")

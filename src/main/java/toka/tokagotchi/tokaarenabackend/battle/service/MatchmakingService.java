@@ -8,6 +8,11 @@ import toka.tokagotchi.tokaarenabackend.tokagotchi.repository.TokagotchiReposito
 
 import java.util.List;
 import java.util.stream.Collectors;
+/**
+ * MatchmakingService: componente del modulo `battle`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Service
 @RequiredArgsConstructor

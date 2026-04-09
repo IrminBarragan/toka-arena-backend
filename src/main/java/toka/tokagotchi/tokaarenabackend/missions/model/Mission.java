@@ -5,6 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+/**
+ * Mission: componente del modulo `missions`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Entity
 @Table(name = "missions")

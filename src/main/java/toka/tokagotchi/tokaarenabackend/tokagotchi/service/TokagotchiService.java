@@ -21,6 +21,11 @@ import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.Random;
+/**
+ * TokagotchiService: componente del modulo `tokagotchi`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Service
 @RequiredArgsConstructor

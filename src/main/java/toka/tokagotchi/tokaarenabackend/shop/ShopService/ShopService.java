@@ -19,6 +19,11 @@ import toka.tokagotchi.tokaarenabackend.inventory.repository.UserConsumableRepos
 import toka.tokagotchi.tokaarenabackend.tokagotchi.service.TokagotchiService;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
+/**
+ * ShopService: componente del modulo `shop`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Service
 @RequiredArgsConstructor

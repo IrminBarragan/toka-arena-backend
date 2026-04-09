@@ -6,6 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import toka.tokagotchi.tokaarenabackend.payment.dto.*;
 import toka.tokagotchi.tokaarenabackend.payment.service.PaymentService;
+/**
+ * PaymentController: componente del modulo `payment`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @RestController
 @RequestMapping("/api/v1/payments")

@@ -3,6 +3,11 @@ package toka.tokagotchi.tokaarenabackend.inventory.constant;
 import toka.tokagotchi.tokaarenabackend.inventory.dto.CoinPackageResponse;
 
 import java.util.List;
+/**
+ * ShopConstants: componente del modulo `inventory`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 public class ShopConstants {
     public static final List<CoinPackageResponse> TF_PACKAGES = List.of(

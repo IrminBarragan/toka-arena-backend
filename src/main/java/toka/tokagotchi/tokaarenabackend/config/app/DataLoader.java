@@ -24,6 +24,11 @@ import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
 import java.util.List;
+/**
+ * DataLoader: componente del modulo `config`.
+ * Su responsabilidad principal es definir configuraciones de la aplicacion.
+ */
+
 
 @Component
 @RequiredArgsConstructor

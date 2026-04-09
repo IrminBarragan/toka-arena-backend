@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 
 import jakarta.persistence.*;
 import lombok.*;
+/**
+ * Consumable: componente del modulo `inventory`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Entity
 @Table(name = "consumables")

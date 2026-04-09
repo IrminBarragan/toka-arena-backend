@@ -1,6 +1,11 @@
 package toka.tokagotchi.tokaarenabackend.payment.dto;
 
 import lombok.Data;
+/**
+ * GatewayPaymentCloseData: componente del modulo `payment`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Data
 public class GatewayPaymentCloseData {

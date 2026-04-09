@@ -5,6 +5,11 @@ import lombok.*;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
 
 import java.time.LocalDateTime;
+/**
+ * Battle: componente del modulo `battle`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Entity
 @Table(name = "battles")

@@ -4,6 +4,11 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryImplementati
 import toka.tokagotchi.tokaarenabackend.missions.model.UserMission;
 
 import java.util.List;
+/**
+ * UserMissionRepository: componente del modulo `missions`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 public interface UserMissionRepository extends JpaRepositoryImplementation<UserMission, Long> {
 

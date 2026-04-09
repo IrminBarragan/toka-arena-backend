@@ -4,6 +4,11 @@ import lombok.Builder;
 import lombok.Data;
 import toka.tokagotchi.tokaarenabackend.common.enums.Rarity;
 import toka.tokagotchi.tokaarenabackend.common.enums.Species;
+/**
+ * MatchmakingOpponentDTO: componente del modulo `battle`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Data
 @Builder

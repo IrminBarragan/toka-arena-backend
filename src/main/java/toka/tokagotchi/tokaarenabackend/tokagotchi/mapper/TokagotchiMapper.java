@@ -6,6 +6,11 @@ import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.TokagotchiResponse;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.model.Tokagotchi;
 
 import static java.util.stream.Collectors.toList;
+/**
+ * TokagotchiMapper: componente del modulo `tokagotchi`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Component
 public class TokagotchiMapper {

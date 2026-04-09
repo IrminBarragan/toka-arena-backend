@@ -15,6 +15,11 @@ import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Random;
+/**
+ * EvolutionService: componente del modulo `tokagotchi`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Service
 @RequiredArgsConstructor

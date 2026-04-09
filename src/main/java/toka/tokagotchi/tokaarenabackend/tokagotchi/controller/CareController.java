@@ -5,6 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.TokagotchiResponse;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.service.CareService;
+/**
+ * CareController: componente del modulo `tokagotchi`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @RestController
 @RequestMapping("/api/v1/tokagotchi/care")

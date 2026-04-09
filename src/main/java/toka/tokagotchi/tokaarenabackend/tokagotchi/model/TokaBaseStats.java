@@ -1,6 +1,11 @@
 package toka.tokagotchi.tokaarenabackend.tokagotchi.model;
 
 import lombok.Getter;
+/**
+ * TokaBaseStats: componente del modulo `tokagotchi`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Getter
 public enum TokaBaseStats {

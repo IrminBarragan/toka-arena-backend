@@ -8,6 +8,11 @@ import toka.tokagotchi.tokaarenabackend.common.enums.Species;
 import toka.tokagotchi.tokaarenabackend.inventory.model.Accessory;
 
 import java.util.List;
+/**
+ * TokagotchiResponse: componente del modulo `tokagotchi`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Data
 @Builder

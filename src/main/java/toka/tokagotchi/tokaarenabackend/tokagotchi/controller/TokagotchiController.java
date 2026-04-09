@@ -8,6 +8,11 @@ import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.RenameTokagotchiRequest;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.TokagotchiResponse;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.mapper.TokagotchiMapper;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.service.TokagotchiService;
+/**
+ * TokagotchiController: componente del modulo `tokagotchi`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @RestController
 @RequestMapping("/api/v1/tokagotchi")

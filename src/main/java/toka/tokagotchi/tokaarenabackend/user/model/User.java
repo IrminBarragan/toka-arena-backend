@@ -7,6 +7,11 @@ import toka.tokagotchi.tokaarenabackend.inventory.model.UserConsumable;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.model.Tokagotchi;
 
 import java.util.List;
+/**
+ * User: componente del modulo `user`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Entity
 @Table(name = "users")

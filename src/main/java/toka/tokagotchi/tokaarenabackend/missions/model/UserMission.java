@@ -9,6 +9,11 @@ import lombok.NoArgsConstructor;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
 
 import java.time.LocalDateTime;
+/**
+ * UserMission: componente del modulo `missions`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Entity
 @Table(name = "user_missions")

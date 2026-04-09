@@ -16,10 +16,17 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+/**
+ * Entrega el estado de misiones del usuario autenticado
+ * en un formato simple para la UI.
+ */
 public class MissionController {
 
     private final MissionService missionService;
 
+    /**
+     * Obtiene misiones vigentes y un resumen de completadas.
+     */
     @GetMapping("/missions")
     public ResponseEntity<?> getMyMissions() {
         // Extraer ID del usuario desde el Doble Token
@@ -37,6 +44,9 @@ public class MissionController {
         ));
     }
 
+    /**
+     * Convierte una entidad UserMission a un mapa liviano para respuesta JSON.
+     */
     private Map<String, Object> mapToDto(UserMission um) {
         return Map.of(
                 "id", um.getId(),

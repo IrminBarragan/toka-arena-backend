@@ -14,6 +14,11 @@ import toka.tokagotchi.tokaarenabackend.payment.dto.GatewayPaymentCreateData;
 import toka.tokagotchi.tokaarenabackend.payment.dto.GatewayPaymentCreateRequest;
 import toka.tokagotchi.tokaarenabackend.payment.dto.GatewayPaymentIdRequest;
 import toka.tokagotchi.tokaarenabackend.payment.dto.GatewayPaymentInquiryData;
+/**
+ * PaymentGatewayClient: componente del modulo `payment`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Component
 @RequiredArgsConstructor

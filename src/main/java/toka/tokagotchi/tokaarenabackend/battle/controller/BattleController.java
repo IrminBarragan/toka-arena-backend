@@ -15,6 +15,11 @@ import toka.tokagotchi.tokaarenabackend.battle.service.BattleService;
 import toka.tokagotchi.tokaarenabackend.battle.service.MatchmakingService;
 
 import java.util.List;
+/**
+ * BattleController: componente del modulo `battle`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @RestController
 @RequestMapping("/api/v1/battle")

@@ -7,6 +7,11 @@ import toka.tokagotchi.tokaarenabackend.inventory.dto.ConsumableDTO;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.TokagotchiResponse;
 
 import java.util.List;
+/**
+ * UserDTO: componente del modulo `user`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Data
 @Builder

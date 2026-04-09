@@ -5,6 +5,11 @@ import toka.tokagotchi.tokaarenabackend.battle.model.BattleState;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+/**
+ * BattleMemoryStorage: componente del modulo `battle`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Component
 public class BattleMemoryStorage {

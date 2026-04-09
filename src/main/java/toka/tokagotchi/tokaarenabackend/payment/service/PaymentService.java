@@ -15,6 +15,11 @@ import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+/**
+ * PaymentService: componente del modulo `payment`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Service
 @RequiredArgsConstructor

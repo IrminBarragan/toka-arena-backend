@@ -12,6 +12,11 @@ import toka.tokagotchi.tokaarenabackend.tokagotchi.model.Tokagotchi;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.repository.TokagotchiRepository;
 
 import java.time.LocalDateTime;
+/**
+ * CareService: componente del modulo `tokagotchi`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Service
 @RequiredArgsConstructor

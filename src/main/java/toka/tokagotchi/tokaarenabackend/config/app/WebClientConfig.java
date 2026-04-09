@@ -6,6 +6,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.web.reactive.function.client.WebClient;
+/**
+ * WebClientConfig: componente del modulo `config`.
+ * Su responsabilidad principal es definir configuraciones de la aplicacion.
+ */
+
 
 @Configuration
 public class WebClientConfig {

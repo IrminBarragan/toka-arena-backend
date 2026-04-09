@@ -6,6 +6,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
+/**
+ * JwtUtils: componente del modulo `security`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Component
 public class JwtUtils {

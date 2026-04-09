@@ -13,11 +13,18 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+/**
+ * Expone endpoints de autenticacion para convertir el authCode externo
+ * en un JWT interno consumible por el resto del backend.
+ */
 public class AuthController {
 
     private final ExternalAuthService externalAuthService;
     private final JwtUtils jwtUtils;
 
+    /**
+     * Intercambia un authCode de la Super App por un JWT interno.
+     */
     @PostMapping("/login-superapp")
     public ResponseEntity<?> loginFromSuperApp(@RequestBody Map<String, String> request) {
         // Intentamos obtenerlo de ambas formas para evitar errores del cliente

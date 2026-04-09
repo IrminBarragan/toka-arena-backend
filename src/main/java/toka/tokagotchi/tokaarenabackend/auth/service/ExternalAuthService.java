@@ -10,6 +10,10 @@ import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
 @Service
+/**
+ * Encapsula la autenticacion contra la Super App y sincroniza
+ * el usuario local con el token externo cifrado.
+ */
 public class ExternalAuthService {
 
     @Qualifier("talentLandWebClient")
@@ -24,6 +28,9 @@ public class ExternalAuthService {
         this.encryptor = encryptor;
     }
 
+    /**
+     * Autentica con la API externa y devuelve/crea el usuario local.
+     */
     public User authenticateWithTalentLand(String authCode) {
         if ("DEBUG".equals(authCode)) {
             return userRepository.findByTalentLandUserId("DEBUG_USER_123")

@@ -13,6 +13,11 @@ import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+/**
+ * MissionService: componente del modulo `missions`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Service
 @RequiredArgsConstructor

@@ -5,6 +5,11 @@ import lombok.*;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
 
 import java.time.LocalDateTime;
+/**
+ * PaymentRecord: componente del modulo `payment`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Entity
 @Table(name = "payment_records")

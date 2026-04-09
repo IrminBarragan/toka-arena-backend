@@ -3,6 +3,11 @@ package toka.tokagotchi.tokaarenabackend.battle.model;
 import jakarta.persistence.*;
 import lombok.*;
 import toka.tokagotchi.tokaarenabackend.common.enums.Species;
+/**
+ * Ability: componente del modulo `battle`.
+ * Su responsabilidad principal es soportar funcionalidades del modulo.
+ */
+
 
 @Entity
 @Table(name = "abilities")
