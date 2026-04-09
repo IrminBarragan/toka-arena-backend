@@ -1,9 +1,12 @@
 package toka.tokagotchi.tokaarenabackend.battle.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import toka.tokagotchi.tokaarenabackend.battle.dto.AttackRequest;
+import toka.tokagotchi.tokaarenabackend.battle.dto.StartBattleRequest;
 import toka.tokagotchi.tokaarenabackend.battle.model.Ability;
+import toka.tokagotchi.tokaarenabackend.battle.model.BattleMode;
 import toka.tokagotchi.tokaarenabackend.battle.model.BattleState;
 import toka.tokagotchi.tokaarenabackend.battle.repository.AbilityRepository;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.model.Tokagotchi;
@@ -20,16 +23,41 @@ public class BattleService {
     private final TokagotchiRepository tokaRepo;
     private final BattleMemoryStorage storage;
 
-    public BattleState createBattle(Long myTokaId, Long opponentTokaId) {
-        if (myTokaId.equals(opponentTokaId)) {
-            throw new RuntimeException("No puedes iniciar batalla contra el mismo Tokagotchi");
+    public BattleState createBattle(Long requesterId, StartBattleRequest request) {
+        if (request == null || request.getMyTokaId() == null || request.getOpponentTokaId() == null) {
+            throw new RuntimeException("Debes enviar los Tokagotchis para iniciar la batalla");
         }
 
+        BattleMode mode = request.getMode() == null ? BattleMode.NORMAL : request.getMode();
+        boolean riskConfirmed = request.isRiskConfirmed();
+
+        Tokagotchi p1 = tokaRepo.findById(request.getMyTokaId()).orElseThrow();
+        if (!p1.getOwner().getId().equals(requesterId)) {
+            throw new RuntimeException("Solo puedes iniciar batallas con tus propios Tokagotchis");
+        }
+
+        Tokagotchi p2 = tokaRepo.findById(request.getOpponentTokaId()).orElseThrow();
+        return createBattleInternal(p1, p2, mode, riskConfirmed);
+    }
+
+    public BattleState createBattle(Long myTokaId, Long opponentTokaId) {
         Tokagotchi p1 = tokaRepo.findById(myTokaId).orElseThrow();
         Tokagotchi p2 = tokaRepo.findById(opponentTokaId).orElseThrow();
 
+        return createBattleInternal(p1, p2, BattleMode.NORMAL, false);
+    }
+
+    private BattleState createBattleInternal(Tokagotchi p1, Tokagotchi p2, BattleMode mode, boolean riskConfirmed) {
+        if (p1.getId().equals(p2.getId())) {
+            throw new RuntimeException("No puedes iniciar batalla contra el mismo Tokagotchi");
+        }
+
         if (p1.getOwner().getId().equals(p2.getOwner().getId())) {
             throw new RuntimeException("No puedes iniciar batalla contra un Tokagotchi del mismo dueño");
+        }
+
+        if (mode == BattleMode.RISKY && !riskConfirmed) {
+            throw new RuntimeException("Debes confirmar la batalla riesgosa antes de iniciar");
         }
 
         BattleState state = BattleState.builder()
@@ -44,6 +72,8 @@ public class BattleService {
                 .toka2Nrg(100)
                 .currentTurnPlayerId(p1.getOwner().getId())
                 .turnNumber(1)
+                .mode(mode.name())
+                .riskConfirmed(riskConfirmed)
                 .finished(false)
                 .build();
 
@@ -55,6 +85,7 @@ public class BattleService {
         return storage.findById(battleId);
     }
 
+    @Transactional
     public BattleState performAttack(Long playerId, AttackRequest request) {
         BattleState state = storage.findById(request.getBattleId());
         if (state == null || state.isFinished()) throw new RuntimeException("Batalla no encontrada o finalizada");
@@ -104,11 +135,29 @@ public class BattleService {
         if (state.getToka1Hp() <= 0 || state.getToka2Hp() <= 0) {
             state.setFinished(true);
             state.setWinnerId(state.getToka1Hp() <= 0 ? state.getPlayer2Id() : state.getPlayer1Id());
+            applyRiskyStakeIfNeeded(state);
         }
 
         state.setTurnNumber(state.getTurnNumber() + 1);
         storage.save(state);
         return state;
+    }
+
+    private void applyRiskyStakeIfNeeded(BattleState state) {
+        if (!"RISKY".equalsIgnoreCase(state.getMode()) || !state.isRiskConfirmed()) {
+            return;
+        }
+
+        Long loserTokaId = state.getToka1Hp() <= 0 ? state.getToka1Id() : state.getToka2Id();
+        Long winnerTokaId = state.getToka1Hp() <= 0 ? state.getToka2Id() : state.getToka1Id();
+
+        Tokagotchi loserToka = tokaRepo.findById(loserTokaId).orElseThrow();
+        Tokagotchi winnerToka = tokaRepo.findById(winnerTokaId).orElseThrow();
+
+        if (!loserToka.getOwner().getId().equals(winnerToka.getOwner().getId())) {
+            loserToka.setOwner(winnerToka.getOwner());
+            tokaRepo.save(loserToka);
+        }
     }
 
     public List<Ability> getAbilitiesByToka(Long tokaId) {

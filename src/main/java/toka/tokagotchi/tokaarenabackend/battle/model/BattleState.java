@@ -27,6 +27,8 @@ public class BattleState implements Serializable {
 
     private Long currentTurnPlayerId;
     private int turnNumber;
+    private String mode;
+    private boolean riskConfirmed;
     private boolean finished;
     private Long winnerId;
 }

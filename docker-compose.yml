@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: toka-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: toka
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+
+  backend:
+    build: .
+    container_name: toka-backend
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+    environment:
+      MYSQL_URL: jdbc:mysql://mysql:3306/toka
+      MYSQLUSER: root
+      MYSQLPASSWORD: root
+      JWT_SECRET: clave_super_larga_segura

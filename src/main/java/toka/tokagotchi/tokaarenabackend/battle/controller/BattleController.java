@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 import toka.tokagotchi.tokaarenabackend.battle.dto.AttackRequest;
 import toka.tokagotchi.tokaarenabackend.battle.dto.MatchmakingOpponentDTO;
+import toka.tokagotchi.tokaarenabackend.battle.dto.StartBattleRequest;
 import toka.tokagotchi.tokaarenabackend.battle.model.Ability;
 import toka.tokagotchi.tokaarenabackend.battle.model.BattleState;
 import toka.tokagotchi.tokaarenabackend.battle.service.BattleService;
@@ -51,8 +52,25 @@ public class BattleController {
     }
 
     @PostMapping("/start/{myTokaId}/{opponentTokaId}")
-    public ResponseEntity<BattleState> startBattle(@PathVariable Long myTokaId, @PathVariable Long opponentTokaId) {
-        return ResponseEntity.ok(battleService.createBattle(myTokaId, opponentTokaId));
+    public ResponseEntity<BattleState> startBattle(
+            @AuthenticationPrincipal Object principal,
+            @PathVariable Long myTokaId,
+            @PathVariable Long opponentTokaId
+    ) {
+        Long userId = resolveUserId(principal);
+        StartBattleRequest request = new StartBattleRequest();
+        request.setMyTokaId(myTokaId);
+        request.setOpponentTokaId(opponentTokaId);
+        return ResponseEntity.ok(battleService.createBattle(userId, request));
+    }
+
+    @PostMapping("/start")
+    public ResponseEntity<BattleState> startBattleWithMode(
+            @AuthenticationPrincipal Object principal,
+            @RequestBody StartBattleRequest request
+    ) {
+        Long userId = resolveUserId(principal);
+        return ResponseEntity.ok(battleService.createBattle(userId, request));
     }
 
     @GetMapping("/abilities/{tokaId}")
