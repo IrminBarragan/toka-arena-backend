@@ -2,6 +2,7 @@ package toka.tokagotchi.tokaarenabackend.shop.ShopService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import toka.tokagotchi.tokaarenabackend.common.enums.Rarity;
@@ -15,7 +16,6 @@ import toka.tokagotchi.tokaarenabackend.inventory.repository.AccessoryRepository
 import toka.tokagotchi.tokaarenabackend.inventory.repository.ConsumableRepository;
 import toka.tokagotchi.tokaarenabackend.inventory.repository.UserAccessoryRepository;
 import toka.tokagotchi.tokaarenabackend.inventory.repository.UserConsumableRepository;
-import toka.tokagotchi.tokaarenabackend.tokagotchi.repository.TokagotchiRepository;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.service.TokagotchiService;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
@@ -33,9 +33,7 @@ public class ShopService {
 
     @Transactional
     public void buyAccessory(Long accessoryId) {
-        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = Long.parseLong(userIdStr);
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = getAuthenticatedUser();
 
         Accessory accessory = accessoryRepository.findById(accessoryId)
                 .orElseThrow(() -> new RuntimeException("Accesorio no encontrado en el catálogo"));
@@ -120,8 +118,17 @@ public class ShopService {
     }
 
     private User getAuthenticatedUser() {
-        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = Long.parseLong(userIdStr);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+
+        final Long userId;
+        try {
+            userId = Long.parseLong(authentication.getName());
+        } catch (NumberFormatException ex) {
+            throw new RuntimeException("Token de usuario invalido");
+        }
 
         return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Error de sesión: Usuario no encontrado"));
     }

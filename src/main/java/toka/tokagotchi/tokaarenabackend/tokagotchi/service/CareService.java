@@ -1,6 +1,8 @@
 package toka.tokagotchi.tokaarenabackend.tokagotchi.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toka.tokagotchi.tokaarenabackend.missions.Service.MissionService;
@@ -61,13 +63,33 @@ public class CareService {
     }
 
     private Tokagotchi findAndValidate(Long id) {
-        return tokaRepo.findById(id)
+        Tokagotchi toka = tokaRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tokagotchi no encontrado"));
+
+        Long authenticatedUserId = getAuthenticatedUserId();
+        if (!toka.getOwner().getId().equals(authenticatedUserId)) {
+            throw new RuntimeException("No eres el dueño de este Tokagotchi");
+        }
+
+        return toka;
     }
 
     private void validateCooldown(LocalDateTime lastAction, int minutes, String actionName) {
         if (lastAction != null && lastAction.plusMinutes(minutes).isAfter(LocalDateTime.now())) {
             throw new RuntimeException("Debes esperar antes de volver a " + actionName);
+        }
+    }
+
+    private Long getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+
+        try {
+            return Long.parseLong(authentication.getName());
+        } catch (NumberFormatException ex) {
+            throw new RuntimeException("Token de usuario invalido");
         }
     }
 }

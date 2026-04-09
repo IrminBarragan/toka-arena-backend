@@ -2,10 +2,12 @@ package toka.tokagotchi.tokaarenabackend.tokagotchi.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import toka.tokagotchi.tokaarenabackend.battle.model.Ability;
 import toka.tokagotchi.tokaarenabackend.battle.repository.AbilityRepository;
+import toka.tokagotchi.tokaarenabackend.common.enums.AccessoryType;
 import toka.tokagotchi.tokaarenabackend.common.enums.Rarity;
 import toka.tokagotchi.tokaarenabackend.common.enums.Species;
 import toka.tokagotchi.tokaarenabackend.inventory.model.Accessory;
@@ -20,7 +22,6 @@ import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 @Service
@@ -36,10 +37,7 @@ public class TokagotchiService {
 
     @Transactional
     public TokagotchiResponse equipAccessory(Long tokaId, Long userAccessoryId) {
-        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = Long.parseLong(userIdStr);
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        User user = getAuthenticatedUser();
 
         Tokagotchi toka = tokaRepo.findById(tokaId)
                 .orElseThrow(() -> new RuntimeException("Tokagotchi no encontrado"));
@@ -56,13 +54,27 @@ public class TokagotchiService {
         }
 
         Accessory accessory = userAcc.getAccessory();
+        Accessory currentlyEquipped = accessory.getType() == AccessoryType.HEAD
+                ? toka.getEquippedHead()
+                : toka.getEquippedBody();
+
+        if (currentlyEquipped != null && !currentlyEquipped.getId().equals(accessory.getId())) {
+            userAccessoryRepo.findByOwnerIdAndAccessoryId(user.getId(), currentlyEquipped.getId())
+                    .ifPresent(previous -> {
+                        previous.setEquipped(false);
+                        userAccessoryRepo.save(previous);
+                    });
+        }
 
         // Lógica de slots según AccessoryType
-        if (accessory.getType().name().equals("HEAD")) {
+        if (accessory.getType() == AccessoryType.HEAD) {
             toka.setEquippedHead(accessory);
         } else {
             toka.setEquippedBody(accessory);
         }
+
+        userAcc.setEquipped(true);
+        userAccessoryRepo.save(userAcc);
 
         return tokaMapper.toResponse(tokaRepo.save(toka));
     }
@@ -70,7 +82,7 @@ public class TokagotchiService {
     @Transactional
     public Tokagotchi awardExtraToka(User user, Rarity fixedRarity) {
         // Seleccionamos una especie al azar para la recompensa
-        Species randomSpecies = Species.values()[new Random().nextInt(Species.values().length)];
+        Species randomSpecies = Species.values()[random.nextInt(Species.values().length)];
 
         // Aplicamos stats base con jitter (Sección 1.1 y 1.2)
         TokaBaseStats base = TokaBaseStats.valueOf(randomSpecies.name());
@@ -101,6 +113,7 @@ public class TokagotchiService {
         }
 
         Rarity rarity = rollRarity();
+        double rarityMultiplier = rarity.getMultiplier();
 
         Species species = Species.values()[random.nextInt(Species.values().length)];
 
@@ -108,9 +121,9 @@ public class TokagotchiService {
         int baseAtk = getBaseAtk(species);
         int baseDef = getBaseDef(species);
 
-        int hp = applyJitter(baseHp);
-        int atk = applyJitter(baseAtk);
-        int def = applyJitter(baseDef);
+        int hp = (int) Math.round(applyJitter(baseHp) * rarityMultiplier);
+        int atk = (int) Math.round(applyJitter(baseAtk) * rarityMultiplier);
+        int def = (int) Math.round(applyJitter(baseDef) * rarityMultiplier);
 
         int cp = 0;
         List<Ability> speciesAbilities = abilityRepository.findBySpecies(species);
@@ -133,12 +146,8 @@ public class TokagotchiService {
         return tokaRepo.save(toka);
     }
 
-    public Tokagotchi reameTokagotchi(Long tokaId, String newName) {
-        String username = (SecurityContextHolder.getContext().getAuthentication()).getName();
-        Long userId = Long.parseLong(username);
-
-        User user = userRepo.findById(userId)
-                .orElseThrow();
+    public Tokagotchi renameTokagotchi(Long tokaId, String newName) {
+        User user = getAuthenticatedUser();
 
         Tokagotchi toka = tokaRepo.findById(tokaId)
                 .orElseThrow();
@@ -147,12 +156,30 @@ public class TokagotchiService {
             throw new RuntimeException("Not your toka");
         }
 
-        if (newName == null || newName.length() < 3 || newName.length() > 20) {
+        String normalizedName = newName == null ? null : newName.trim();
+        if (normalizedName == null || normalizedName.length() < 3 || normalizedName.length() > 20) {
             throw new RuntimeException("Invalid name");
         }
 
-        toka.setName(newName);
+        toka.setName(normalizedName);
         return tokaRepo.save(toka);
+    }
+
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+
+        final Long userId;
+        try {
+            userId = Long.parseLong(authentication.getName());
+        } catch (NumberFormatException ex) {
+            throw new RuntimeException("Token de usuario invalido");
+        }
+
+        return userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
 
     public Tokagotchi getTokagotchiById(Long tokaId) {
