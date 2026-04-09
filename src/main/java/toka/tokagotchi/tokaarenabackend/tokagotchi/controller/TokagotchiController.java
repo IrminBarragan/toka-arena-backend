@@ -24,11 +24,16 @@ public class TokagotchiController {
     }
 
     @PostMapping("/claim-starter")
-    public ResponseEntity<?> claimStarter() {
-        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+    public ResponseEntity<TokagotchiResponse> claimStarter() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new RuntimeException("Authentication required");
+        }
+
+        String userIdStr = authentication.getName();
         Long userId = Long.parseLong(userIdStr);
 
-        Tokagotchi response = service.createStarter(userId);
+        TokagotchiResponse response = service.createStarter(userId);
         return ResponseEntity.ok(response);
     }
 

@@ -20,7 +20,6 @@ import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 @Service
@@ -36,7 +35,12 @@ public class TokagotchiService {
 
     @Transactional
     public TokagotchiResponse equipAccessory(Long tokaId, Long userAccessoryId) {
-        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new RuntimeException("Authentication required");
+        }
+
+        String userIdStr = authentication.getName();
         Long userId = Long.parseLong(userIdStr);
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -92,7 +96,8 @@ public class TokagotchiService {
         return tokaRepo.save(extraToka);
     }
 
-    public Tokagotchi createStarter(Long userId) {
+    @Transactional
+    public TokagotchiResponse createStarter(Long userId) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -127,14 +132,25 @@ public class TokagotchiService {
                 .owner(user)
                 .build();
 
-        user.setFirstToka(true);
-        userRepo.save(user);
 
-        return tokaRepo.save(toka);
+        user.setFirstToka(true);
+        toka = tokaRepo.save(toka);
+        List<Tokagotchi> tokagotchis = user.getTokagotchis();
+        tokagotchis.add(toka);
+
+        user.setTokagotchis(tokagotchis);
+        user.setTokagotchiActivo(toka);
+        userRepo.save(user);
+        return tokaMapper.toResponse(toka);
     }
 
     public Tokagotchi reameTokagotchi(Long tokaId, String newName) {
-        String username = (SecurityContextHolder.getContext().getAuthentication()).getName();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new RuntimeException("Authentication required");
+        }
+
+        String username = authentication.getName();
         Long userId = Long.parseLong(username);
 
         User user = userRepo.findById(userId)
