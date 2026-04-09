@@ -2,6 +2,7 @@ package toka.tokagotchi.tokaarenabackend.tokagotchi.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import toka.tokagotchi.tokaarenabackend.battle.model.Ability;
 import toka.tokagotchi.tokaarenabackend.common.enums.Rarity;
 import toka.tokagotchi.tokaarenabackend.common.enums.Species;
 import toka.tokagotchi.tokaarenabackend.inventory.model.Accessory;
@@ -20,7 +21,8 @@ public class TokagotchiResponse {
     private int def;
     private int cp;
 
-    // Accesorios completos
     private Accessory equippedHead;
     private Accessory equippedBody;
+
+    private List<AbilityDTO> abilities;
 }

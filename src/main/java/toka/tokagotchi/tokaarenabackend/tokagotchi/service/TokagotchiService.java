@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import toka.tokagotchi.tokaarenabackend.battle.model.Ability;
+import toka.tokagotchi.tokaarenabackend.battle.repository.AbilityRepository;
 import toka.tokagotchi.tokaarenabackend.common.enums.Rarity;
 import toka.tokagotchi.tokaarenabackend.common.enums.Species;
 import toka.tokagotchi.tokaarenabackend.inventory.model.Accessory;
@@ -11,11 +13,13 @@ import toka.tokagotchi.tokaarenabackend.inventory.model.UserAccessory;
 import toka.tokagotchi.tokaarenabackend.inventory.repository.UserAccessoryRepository;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.TokagotchiResponse;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.mapper.TokagotchiMapper;
+import toka.tokagotchi.tokaarenabackend.tokagotchi.model.TokaBaseStats;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.model.Tokagotchi;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.repository.TokagotchiRepository;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -27,12 +31,15 @@ public class TokagotchiService {
     private final UserRepository userRepo;
     private final UserAccessoryRepository userAccessoryRepo;
     private final TokagotchiMapper tokaMapper;
+    private final AbilityRepository abilityRepository;
     private final Random random = new Random();
-    
+
     @Transactional
     public TokagotchiResponse equipAccessory(Long tokaId, Long userAccessoryId) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepo.findByUsername(username).orElseThrow();
+        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = Long.parseLong(userIdStr);
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Tokagotchi toka = tokaRepo.findById(tokaId)
                 .orElseThrow(() -> new RuntimeException("Tokagotchi no encontrado"));
@@ -59,13 +66,35 @@ public class TokagotchiService {
 
         return tokaMapper.toResponse(tokaRepo.save(toka));
     }
-    public Tokagotchi createStarter() {
-        String username = Objects.requireNonNull(SecurityContextHolder.getContext()
-                        .getAuthentication())
-                .getName();
 
-        User user = userRepo.findByUsername(username)
-                .orElseThrow();
+    @Transactional
+    public Tokagotchi awardExtraToka(User user, Rarity fixedRarity) {
+        // Seleccionamos una especie al azar para la recompensa
+        Species randomSpecies = Species.values()[new Random().nextInt(Species.values().length)];
+
+        // Aplicamos stats base con jitter (Sección 1.1 y 1.2)
+        TokaBaseStats base = TokaBaseStats.valueOf(randomSpecies.name());
+        double mult = fixedRarity.getMultiplier();
+
+        Tokagotchi extraToka = Tokagotchi.builder()
+                .name(randomSpecies.name() + " de Regalo")
+                .species(randomSpecies)
+                .rarity(fixedRarity)
+                .hp((int)(applyJitter(base.getHp()) * mult))
+                .atk((int)(applyJitter(base.getAtk()) * mult))
+                .def((int)(applyJitter(base.getDef()) * mult))
+                .owner(user)
+                .build();
+
+        // Asignamos habilidades de la especie
+        extraToka.setAbilities(abilityRepository.findBySpecies(randomSpecies));
+
+        return tokaRepo.save(extraToka);
+    }
+
+    public Tokagotchi createStarter(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (user.isFirstToka()) {
             throw new RuntimeException("Starter already started");
@@ -83,8 +112,8 @@ public class TokagotchiService {
         int atk = applyJitter(baseAtk);
         int def = applyJitter(baseDef);
 
-        int happiness = 80;
         int cp = 0;
+        List<Ability> speciesAbilities = abilityRepository.findBySpecies(species);
 
         Tokagotchi toka = Tokagotchi.builder()
                 .name(species.name())
@@ -94,6 +123,7 @@ public class TokagotchiService {
                 .atk(atk)
                 .def(def)
                 .cp(cp)
+                .abilities(speciesAbilities)
                 .owner(user)
                 .build();
 
@@ -104,11 +134,10 @@ public class TokagotchiService {
     }
 
     public Tokagotchi reameTokagotchi(Long tokaId, String newName) {
-        String username = (SecurityContextHolder.getContext()
-                        .getAuthentication())
-                .getName();
+        String username = (SecurityContextHolder.getContext().getAuthentication()).getName();
+        Long userId = Long.parseLong(username);
 
-        User user = userRepo.findByUsername(username)
+        User user = userRepo.findById(userId)
                 .orElseThrow();
 
         Tokagotchi toka = tokaRepo.findById(tokaId)

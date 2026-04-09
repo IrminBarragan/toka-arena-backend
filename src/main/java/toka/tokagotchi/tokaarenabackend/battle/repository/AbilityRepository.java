@@ -6,6 +6,6 @@ import toka.tokagotchi.tokaarenabackend.common.enums.Species;
 
 import java.util.List;
 
-public interface AbilityRepository extends JpaRepository<Ability, String> {
+public interface AbilityRepository extends JpaRepository<Ability, Long> {
     List<Ability> findBySpecies(Species species);
 }

@@ -14,13 +14,14 @@ import toka.tokagotchi.tokaarenabackend.common.enums.Species;
 public class Ability {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String nombre;
-    private int costoNRG;
-    private Double multiplicador;
-    private String descripcion;
-    private boolean esSignature;
+    private String name;
+    private int energyCost;
+    private Double multiplier;
+    private String description;
+    private boolean isSignature;
     private boolean scaleWithRarity;
 
     @Enumerated(EnumType.STRING)

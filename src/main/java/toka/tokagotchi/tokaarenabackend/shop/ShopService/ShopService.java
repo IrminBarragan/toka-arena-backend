@@ -4,6 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import toka.tokagotchi.tokaarenabackend.common.enums.Rarity;
+import toka.tokagotchi.tokaarenabackend.inventory.constant.ShopConstants;
+import toka.tokagotchi.tokaarenabackend.inventory.dto.CoinPackageResponse;
 import toka.tokagotchi.tokaarenabackend.inventory.model.Accessory;
 import toka.tokagotchi.tokaarenabackend.inventory.model.Consumable;
 import toka.tokagotchi.tokaarenabackend.inventory.model.UserAccessory;
@@ -12,6 +15,8 @@ import toka.tokagotchi.tokaarenabackend.inventory.repository.AccessoryRepository
 import toka.tokagotchi.tokaarenabackend.inventory.repository.ConsumableRepository;
 import toka.tokagotchi.tokaarenabackend.inventory.repository.UserAccessoryRepository;
 import toka.tokagotchi.tokaarenabackend.inventory.repository.UserConsumableRepository;
+import toka.tokagotchi.tokaarenabackend.tokagotchi.repository.TokagotchiRepository;
+import toka.tokagotchi.tokaarenabackend.tokagotchi.service.TokagotchiService;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
@@ -24,10 +29,14 @@ public class ShopService {
     private final ConsumableRepository consumableRepository;
     private final UserAccessoryRepository userAccessoryRepository;
     private final UserConsumableRepository userConsumableRepository;
+    private final TokagotchiService tokagotchiService;
 
     @Transactional
     public void buyAccessory(Long accessoryId) {
-        User user = getAuthenticatedUser();
+        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = Long.parseLong(userIdStr);
+        User user = userRepository.findById(userId).orElseThrow();
+
         Accessory accessory = accessoryRepository.findById(accessoryId)
                 .orElseThrow(() -> new RuntimeException("Accesorio no encontrado en el catálogo"));
 
@@ -80,9 +89,40 @@ public class ShopService {
         userConsumableRepository.save(userConsumable);
     }
 
+    @Transactional
+    public String processPackagePurchase(Long userId, String packageId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // 1. Buscar el paquete en las constantes
+        CoinPackageResponse pkg = ShopConstants.TF_PACKAGES.stream()
+                .filter(p -> p.getId().equals(packageId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Paquete no válido"));
+
+        // 2. Acreditar los TF
+        user.setTf(user.getTf() + pkg.getTfAmount());
+        userRepository.save(user);
+
+        // 3. Procesar Recompensas Extra
+        String rewardMessage = "";
+        if ("pkg_3".equals(packageId)) {
+            // Paquete Pro incluye un Tokagotchi Común
+            tokagotchiService.awardExtraToka(user, Rarity.COMMON);
+            rewardMessage = " ¡Y recibiste un Tokagotchi Común!";
+        } else if ("pkg_4".equals(packageId)) {
+            // Paquete Maestro incluye un Tokagotchi Raro
+            tokagotchiService.awardExtraToka(user, Rarity.RARE);
+            rewardMessage = " ¡Y recibiste un Tokagotchi Raro!";
+        }
+
+        return "Compra de " + pkg.getTfAmount() + " TF exitosa." + rewardMessage;
+    }
+
     private User getAuthenticatedUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Error de sesión: Usuario no encontrado"));
+        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = Long.parseLong(userIdStr);
+
+        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Error de sesión: Usuario no encontrado"));
     }
 }

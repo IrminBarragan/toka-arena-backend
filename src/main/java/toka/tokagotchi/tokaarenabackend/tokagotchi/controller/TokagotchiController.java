@@ -2,10 +2,12 @@ package toka.tokagotchi.tokaarenabackend.tokagotchi.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.RenameTokagotchiRequest;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.TokagotchiResponse;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.mapper.TokagotchiMapper;
+import toka.tokagotchi.tokaarenabackend.tokagotchi.model.Tokagotchi;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.service.TokagotchiService;
 
 @RestController
@@ -17,13 +19,17 @@ public class TokagotchiController {
     private final TokagotchiMapper mapper;
 
     @GetMapping("/{id}/get")
-    public TokagotchiResponse getTokagotchiById(@PathVariable Long id) {
-        return mapper.toResponse(service.getTokagotchiById(id));
+    public ResponseEntity<TokagotchiResponse> getTokagotchiById(@PathVariable Long id) {
+        return ResponseEntity.ok(mapper.toResponse(service.getTokagotchiById(id)));
     }
 
     @PostMapping("/claim-starter")
-    public TokagotchiResponse claimStarter() {
-        return mapper.toResponse(service.createStarter());
+    public ResponseEntity<?> claimStarter() {
+        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = Long.parseLong(userIdStr);
+
+        Tokagotchi response = service.createStarter(userId);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/rename")

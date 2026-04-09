@@ -22,18 +22,14 @@ public class User {
     private Long id;
 
     @Column(unique = true, nullable = false)
+    private String talentLandUserId;
+
+    @Column(columnDefinition = "TEXT")
+    private String currentAccessToken;
+
     private String username;
-
-    @Column(unique = true, nullable = false)
     private String email;
-
-    @Column(nullable = false)
-    private String password;
-
-    private boolean enabled = true;
-
     private double tf;
-
     private boolean firstToka = false;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class AuthResponse {
-    private String token;
-    private boolean firstToka;
+public class TalentLandAuthRequest {
+    private String authCode;
 }
