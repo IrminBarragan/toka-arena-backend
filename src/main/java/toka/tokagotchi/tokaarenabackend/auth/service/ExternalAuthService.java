@@ -25,7 +25,6 @@ public class ExternalAuthService {
     }
 
     public User authenticateWithTalentLand(String authCode) {
-        System.out.println("Recibido authCode para procesar: [" + authCode + "]"); // Añade esto
         if ("DEBUG".equals(authCode)) {
             return userRepository.findByTalentLandUserId("DEBUG_USER_123")
                     .orElseGet(() -> userRepository.save(User.builder()

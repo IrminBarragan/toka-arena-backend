@@ -21,8 +21,16 @@ public class BattleService {
     private final BattleMemoryStorage storage;
 
     public BattleState createBattle(Long myTokaId, Long opponentTokaId) {
+        if (myTokaId.equals(opponentTokaId)) {
+            throw new RuntimeException("No puedes iniciar batalla contra el mismo Tokagotchi");
+        }
+
         Tokagotchi p1 = tokaRepo.findById(myTokaId).orElseThrow();
         Tokagotchi p2 = tokaRepo.findById(opponentTokaId).orElseThrow();
+
+        if (p1.getOwner().getId().equals(p2.getOwner().getId())) {
+            throw new RuntimeException("No puedes iniciar batalla contra un Tokagotchi del mismo dueño");
+        }
 
         BattleState state = BattleState.builder()
                 .battleId(UUID.randomUUID().toString())
@@ -63,6 +71,10 @@ public class BattleService {
         Tokagotchi attacker = tokaRepo.findById(attackerTokaId).orElseThrow();
         Tokagotchi defender = tokaRepo.findById(isPlayer1 ? state.getToka2Id() : state.getToka1Id()).orElseThrow();
         Ability ability = abilityRepo.findById(request.getAbilityId()).orElseThrow();
+
+        if (ability.getSpecies() != attacker.getSpecies()) {
+            throw new RuntimeException("La habilidad no corresponde a la especie de tu Tokagotchi");
+        }
 
         // 3. Validar NRG
         int currentNrg = isPlayer1 ? state.getToka1Nrg() : state.getToka2Nrg();

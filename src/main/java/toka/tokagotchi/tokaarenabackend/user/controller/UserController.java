@@ -2,6 +2,7 @@ package toka.tokagotchi.tokaarenabackend.user.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +26,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getMyFullProfile() {
         // 1. Obtener ID desde el Token B
-        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = Long.parseLong(userIdStr);
+        Long userId = getAuthenticatedUserId();
 
         // 2. Buscar usuario con sus relaciones
         User user = userRepository.findById(userId)
@@ -62,5 +62,18 @@ public class UserController {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    private Long getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+
+        try {
+            return Long.parseLong(authentication.getName());
+        } catch (NumberFormatException ex) {
+            throw new RuntimeException("Token de usuario invalido");
+        }
     }
 }

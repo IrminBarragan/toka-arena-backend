@@ -9,5 +9,4 @@ public class AccessoryDTO {
     private long id;
     private String name;
     private Boolean equipped;
-
 }

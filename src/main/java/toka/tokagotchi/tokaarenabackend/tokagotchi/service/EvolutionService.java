@@ -1,6 +1,8 @@
 package toka.tokagotchi.tokaarenabackend.tokagotchi.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import toka.tokagotchi.tokaarenabackend.common.enums.Rarity;
@@ -29,6 +31,10 @@ public class EvolutionService {
                 .orElseThrow(() -> new RuntimeException("Tokagotchi no encontrado"));
 
         User owner = toka.getOwner();
+        Long authenticatedUserId = getAuthenticatedUserId();
+        if (!owner.getId().equals(authenticatedUserId)) {
+            throw new RuntimeException("No eres el dueño de este Tokagotchi");
+        }
 
         // 1. Validar Cooldown (Sección 4 del PDF)
         // Mensaje específico solicitado para errores de tiempo
@@ -94,8 +100,21 @@ public class EvolutionService {
             case COMMON -> Rarity.RARE;
             case RARE -> Rarity.EPIC;
             case EPIC -> Rarity.LEGENDARY;
-            default -> null;
+            default -> throw new RuntimeException("Tu Tokagotchi ya alcanzó el nivel máximo (Legendario).");
         };
+    }
+
+    private Long getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+
+        try {
+            return Long.parseLong(authentication.getName());
+        } catch (NumberFormatException ex) {
+            throw new RuntimeException("Token de usuario invalido");
+        }
     }
 
     private record EvolutionConfig(int minCp, int costTf, int successProb, int cooldownHours) {}

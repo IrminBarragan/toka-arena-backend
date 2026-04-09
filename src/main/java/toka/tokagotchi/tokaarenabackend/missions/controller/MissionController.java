@@ -14,13 +14,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/missions")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class MissionController {
 
     private final MissionService missionService;
 
-    @GetMapping
+    @GetMapping("/missions")
     public ResponseEntity<?> getMyMissions() {
         // Extraer ID del usuario desde el Doble Token
         String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
