@@ -3,6 +3,7 @@ package toka.tokagotchi.tokaarenabackend.tokagotchi.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import toka.tokagotchi.tokaarenabackend.missions.Service.MissionService;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.dto.TokagotchiResponse;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.mapper.TokagotchiMapper;
 import toka.tokagotchi.tokaarenabackend.tokagotchi.model.Tokagotchi;
@@ -16,6 +17,7 @@ public class CareService {
 
     private final TokagotchiRepository tokaRepo;
     private final TokagotchiMapper tokaMapper;
+    private final MissionService missionService;
 
     @Transactional
     public TokagotchiResponse feed(Long tokaId) {
@@ -26,6 +28,7 @@ public class CareService {
 
         toka.setCp(toka.getCp() + 5);
         toka.setLastFed(LocalDateTime.now());
+        missionService.updateProgress(toka.getOwner().getId(), "ALIMENTAR");
 
         return tokaMapper.toResponse(tokaRepo.save(toka));
     }
@@ -39,6 +42,7 @@ public class CareService {
 
         toka.setCp(toka.getCp() + 8);
         toka.setLastPlayed(LocalDateTime.now());
+        missionService.updateProgress(toka.getOwner().getId(), "JUGAR");
 
         return tokaMapper.toResponse(tokaRepo.save(toka));
     }
@@ -52,7 +56,7 @@ public class CareService {
 
         toka.setCp(toka.getCp() + 4);
         toka.setLastBathed(LocalDateTime.now());
-
+        missionService.updateProgress(toka.getOwner().getId(), "BAÑAR");
         return tokaMapper.toResponse(tokaRepo.save(toka));
     }
 

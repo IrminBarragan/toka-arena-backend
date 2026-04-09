@@ -15,6 +15,8 @@ import toka.tokagotchi.tokaarenabackend.inventory.repository.AccessoryRepository
 import toka.tokagotchi.tokaarenabackend.inventory.repository.ConsumableRepository;
 import toka.tokagotchi.tokaarenabackend.inventory.repository.UserAccessoryRepository;
 import toka.tokagotchi.tokaarenabackend.inventory.repository.UserConsumableRepository;
+import toka.tokagotchi.tokaarenabackend.missions.model.Mission;
+import toka.tokagotchi.tokaarenabackend.missions.repository.MissionRepository;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
@@ -30,6 +32,7 @@ public class DataLoader implements CommandLineRunner {
     private final UserConsumableRepository userConsumableRepository;
     private final AbilityRepository abilityRepository;
     private final UserRepository userRepository;
+    private final MissionRepository missionRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -37,7 +40,8 @@ public class DataLoader implements CommandLineRunner {
         loadConsumables();
         loadUserData();
         loadAbilities();
-        System.out.println("✅ Datos iniciales cargados correctamente.");
+        loadMissions();
+        System.out.println(" Datos iniciales cargados correctamente.");
     }
 
     private void loadAccessories() {
@@ -174,6 +178,16 @@ public class DataLoader implements CommandLineRunner {
                         .description("Cura 5% HP/turno por 3 turnos").isSignature(false).scaleWithRarity(false).build(),
                 Ability.builder().name("Bosque Ancestral").energyCost(45).multiplier(0.0).species(Species.HANA)
                         .description("Signature: Refleja 40% daño (60% en Legendario)").isSignature(true).scaleWithRarity(true).build()
+        ));
+    }
+
+    private void loadMissions() {
+        if (missionRepository.count() > 0) return;
+
+        missionRepository.saveAll(List.of(
+                Mission.builder().description("ALIMENTA A TU TOKA").requiredAmount(1).rewardTf(2.0).type("ALIMENTAR").build(),
+                Mission.builder().description("JUEGA CON TU TOKA").requiredAmount(1).rewardTf(3.0).type("JUGAR").build(),
+                Mission.builder().description("BAÑA A TU TOKA").requiredAmount(1).rewardTf(2.0).type("BAÑAR").build()
         ));
     }
 }
