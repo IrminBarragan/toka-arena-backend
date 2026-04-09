@@ -41,7 +41,7 @@ public class TokagotchiController {
         return mapper.toResponse(service.reameTokagotchi(id, request.getNewName()));
     }
 
-    @PatchMapping("/{id}/activate")
+    @PostMapping("/{id}/activate")
     public ResponseEntity<TokagotchiResponse> activateTokagotchi(@PathVariable Long id) {
         return ResponseEntity.ok(mapper.toResponse(service.activateTokagotchi(id)));
     }
