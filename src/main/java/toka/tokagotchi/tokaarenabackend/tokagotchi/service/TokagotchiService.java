@@ -171,6 +171,27 @@ public class TokagotchiService {
         return tokaRepo.save(toka);
     }
 
+    @Transactional
+    public Tokagotchi activateTokagotchi(Long tokaId) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new RuntimeException("Authentication required");
+        }
+
+        Long userId = Long.parseLong(authentication.getName());
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Tokagotchi toka = tokaRepo.findByIdAndOwnerId(tokaId, userId)
+                .orElseThrow(() -> new RuntimeException("Tokagotchi no encontrado o no te pertenece"));
+
+        user.setTokagotchiActivo(toka);
+        userRepo.save(user);
+
+        return toka;
+    }
+
     public Tokagotchi getTokagotchiById(Long tokaId) {
         return tokaRepo.findById(tokaId)
                 .orElseThrow();
