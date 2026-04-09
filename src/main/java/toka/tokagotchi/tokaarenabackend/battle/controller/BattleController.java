@@ -1,8 +1,10 @@
 package toka.tokagotchi.tokaarenabackend.battle.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 import toka.tokagotchi.tokaarenabackend.battle.dto.AttackRequest;
 import toka.tokagotchi.tokaarenabackend.battle.dto.MatchmakingOpponentDTO;
@@ -10,7 +12,6 @@ import toka.tokagotchi.tokaarenabackend.battle.model.Ability;
 import toka.tokagotchi.tokaarenabackend.battle.model.BattleState;
 import toka.tokagotchi.tokaarenabackend.battle.service.BattleService;
 import toka.tokagotchi.tokaarenabackend.battle.service.MatchmakingService;
-import toka.tokagotchi.tokaarenabackend.user.model.User;
 
 import java.util.List;
 
@@ -28,9 +29,25 @@ public class BattleController {
     }
 
     @PostMapping("/attack")
-    public ResponseEntity<BattleState> attack(@AuthenticationPrincipal User user, @RequestBody AttackRequest request) {
-        // Usamos el ID del usuario autenticado para validar que él sea quien ataca
-        return ResponseEntity.ok(battleService.performAttack(user.getId(), request));
+    public ResponseEntity<BattleState> attack(@AuthenticationPrincipal Object principal, @RequestBody AttackRequest request) {
+        Long userId = resolveUserId(principal);
+        return ResponseEntity.ok(battleService.performAttack(userId, request));
+    }
+
+    private Long resolveUserId(Object principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no autenticado");
+        }
+
+        if (principal instanceof String principalValue) {
+            try {
+                return Long.parseLong(principalValue);
+            } catch (NumberFormatException ex) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Principal JWT invalido");
+            }
+        }
+
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Tipo de principal no soportado");
     }
 
     @PostMapping("/start/{myTokaId}/{opponentTokaId}")

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import toka.tokagotchi.tokaarenabackend.battle.model.Ability;
 import toka.tokagotchi.tokaarenabackend.battle.repository.AbilityRepository;
 import toka.tokagotchi.tokaarenabackend.common.enums.AccessoryType;
+import toka.tokagotchi.tokaarenabackend.common.enums.Rarity;
 import toka.tokagotchi.tokaarenabackend.common.enums.Species;
 import toka.tokagotchi.tokaarenabackend.inventory.model.Accessory;
 import toka.tokagotchi.tokaarenabackend.inventory.model.Consumable;
@@ -17,6 +18,8 @@ import toka.tokagotchi.tokaarenabackend.inventory.repository.UserAccessoryReposi
 import toka.tokagotchi.tokaarenabackend.inventory.repository.UserConsumableRepository;
 import toka.tokagotchi.tokaarenabackend.missions.model.Mission;
 import toka.tokagotchi.tokaarenabackend.missions.repository.MissionRepository;
+import toka.tokagotchi.tokaarenabackend.tokagotchi.model.Tokagotchi;
+import toka.tokagotchi.tokaarenabackend.tokagotchi.repository.TokagotchiRepository;
 import toka.tokagotchi.tokaarenabackend.user.model.User;
 import toka.tokagotchi.tokaarenabackend.user.repository.UserRepository;
 
@@ -33,6 +36,7 @@ public class DataLoader implements CommandLineRunner {
     private final AbilityRepository abilityRepository;
     private final UserRepository userRepository;
     private final MissionRepository missionRepository;
+    private final TokagotchiRepository tokagotchiRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -41,6 +45,7 @@ public class DataLoader implements CommandLineRunner {
         loadUserData();
         loadAbilities();
         loadMissions();
+        loadTestOpponents();
         System.out.println(" Datos iniciales cargados correctamente.");
     }
 
@@ -189,5 +194,40 @@ public class DataLoader implements CommandLineRunner {
                 Mission.builder().description("JUEGA CON TU TOKA").requiredAmount(1).rewardTf(3.0).type("JUGAR").build(),
                 Mission.builder().description("BAÑA A TU TOKA").requiredAmount(1).rewardTf(2.0).type("BAÑAR").build()
         ));
+    }
+
+    private void loadTestOpponents() {
+        if (userRepository.count() > 1) return; // Solo cargar si solo existe el usuario DEBUG
+
+        // 1. Crear Rivales (Sección 10.1: Todos inician con algo de TF)
+        User zafiro = userRepository.save(User.builder()
+                .username("Rival_Zafiro").talentLandUserId("EXT_001").tf(150.0).firstToka(true).build());
+        User mochiMaster = userRepository.save(User.builder()
+                .username("Rival_Mochi_Master").talentLandUserId("EXT_002").tf(50.0).firstToka(true).build());
+        User hanaTank = userRepository.save(User.builder()
+                .username("Rival_Hana_Tank").talentLandUserId("EXT_003").tf(200.0).firstToka(true).build());
+
+        // 2. Crear Tokagotchis para los rivales con Multiplicadores de Rareza (Sección 1.2)
+
+        // Tofu Raro (x1.15)
+        tokagotchiRepository.save(Tokagotchi.builder()
+                .name("Tofu Guardián").species(Species.TOFU).rarity(Rarity.RARE)
+                .hp((int)(100 * 1.15)).atk((int)(13 * 1.15)).def((int)(30 * 1.15))
+                .owner(zafiro).abilities(abilityRepository.findBySpecies(Species.TOFU))
+                .build());
+
+        // Mochi Épico (x1.35) - El "Glass Cannon" (Sección 1.1)
+        tokagotchiRepository.save(Tokagotchi.builder()
+                .name("Mochi Veloz").species(Species.MOCHI).rarity(Rarity.EPIC)
+                .hp((int)(90 * 1.35)).atk((int)(16 * 1.35)).def((int)(20 * 1.35))
+                .owner(mochiMaster).abilities(abilityRepository.findBySpecies(Species.MOCHI))
+                .build());
+
+        // Hana Común (x1.00) - El Tanque (Sección 1.1)
+        tokagotchiRepository.save(Tokagotchi.builder()
+                .name("Hana Bosque").species(Species.HANA).rarity(Rarity.COMMON)
+                .hp(125).atk(10).def(45)
+                .owner(hanaTank).abilities(abilityRepository.findBySpecies(Species.HANA))
+                .build());
     }
 }
